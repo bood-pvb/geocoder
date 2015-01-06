@@ -91,12 +91,12 @@ module Geocoder
       # given two-arguments: the object being geocoded and an array of
       # Geocoder::Result objects).
       #
-      def do_lookup(reverse = false)
+      def do_lookup(reverse = false, address=nil)
         options = self.class.geocoder_options
         if reverse and options[:reverse_geocode]
           query = to_coordinates
         elsif !reverse and options[:geocode]
-          query = send(options[:user_address])
+          query = address
         else
           return
         end

@@ -33,6 +33,14 @@ class GeocoderTest < GeocoderTestCase
     assert_equal coords, [v.latitude, v.longitude]
   end
 
+  def test_geocode_assigns_and_returns_coordinates_for_multiple_locations
+    v = PlaceWithPrefixes.new(*geocoded_object_params(:msg))
+    coords = [40.750354, -73.993371]
+    assert_equal [coords, coords], v.geocode
+    assert_equal coords, [v.origin_latitude, v.origin_longitude]
+    assert_equal coords, [v.destination_latitude, v.destination_longitude]
+  end
+
   def test_geocode_block_executed_when_no_results
     v = PlaceWithCustomResultsHandling.new("Nowhere", "no results")
     v.geocode

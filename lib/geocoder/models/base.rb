@@ -27,12 +27,10 @@ module Geocoder
       private # ----------------------------------------------------------------
 
       def geocoder_init(options)
-        unless defined?(@geocoder_options)
-          @geocoder_options = {}
-          require "geocoder/stores/#{geocoder_file_name}"
-          include Geocoder::Store.const_get(geocoder_module_name)
-        end
+        @geocoder_options ||= {}
         @geocoder_options.merge! options
+        require "geocoder/stores/#{geocoder_file_name}"
+        include Geocoder::Store.const_get(geocoder_module_name)
       end
     end
   end

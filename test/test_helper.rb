@@ -66,7 +66,7 @@ end
 # Require Geocoder after ActiveRecord simulator.
 require 'geocoder'
 require "geocoder/lookups/base"
-
+Geocoder::Railtie.insert
 ##
 # Mock HTTP request to geocoding service.
 #
@@ -251,12 +251,23 @@ end
 # Geocoded model.
 #
 class Place < ActiveRecord::Base
-  geocoded_by :address
+  geocoded_by :address => :address
 
   def initialize(name, address)
     super()
     write_attribute :name, name
     write_attribute :address, address
+  end
+end
+
+class PlaceWithPrefixes < ActiveRecord::Base
+  geocoded_by prefixes: [:origin, :destination]
+
+  def initialize(name, address)
+    super()
+    write_attribute :name, name
+    write_attribute :origin_address, address
+    write_attribute :destination_address, address
   end
 end
 
@@ -286,7 +297,7 @@ class PlaceReverseGeocoded < ActiveRecord::Base
 end
 
 class PlaceWithCustomResultsHandling < ActiveRecord::Base
-  geocoded_by :address do |obj,results|
+  geocoded_by :address => :address do |obj,results|
     if result = results.first
       obj.coords_string = "#{result.latitude},#{result.longitude}"
     else
@@ -317,7 +328,7 @@ class PlaceReverseGeocodedWithCustomResultsHandling < ActiveRecord::Base
 end
 
 class PlaceWithForwardAndReverseGeocoding < ActiveRecord::Base
-  geocoded_by :address, :latitude => :lat, :longitude => :lon
+  geocoded_by :address => :address, :latitude => :lat, :longitude => :lon
   reverse_geocoded_by :lat, :lon, :address => :location
 
   def initialize(name)
@@ -327,7 +338,7 @@ class PlaceWithForwardAndReverseGeocoding < ActiveRecord::Base
 end
 
 class PlaceWithCustomLookup < ActiveRecord::Base
-  geocoded_by :address, :lookup => :nominatim do |obj,results|
+  geocoded_by :address => :address, :lookup => :nominatim do |obj,results|
     if result = results.first
       obj.result_class = result.class
     end
@@ -341,7 +352,7 @@ class PlaceWithCustomLookup < ActiveRecord::Base
 end
 
 class PlaceWithCustomLookupProc < ActiveRecord::Base
-  geocoded_by :address, :lookup => lambda{|obj| obj.custom_lookup } do |obj,results|
+  geocoded_by :address => :address, :lookup => lambda{|obj| obj.custom_lookup } do |obj,results|
     if result = results.first
       obj.result_class = result.class
     end
